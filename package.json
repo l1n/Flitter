@@ -1,0 +1,16 @@
+{
+  "name": "Flitter",
+  "version": "1.0.0",
+  "description": "Sympa Scraper utilizing Casper.JS",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Lin DasSarma",
+  "license": "ISC",
+  "dependencies": {
+    "casperjs": "^1.1.0-beta3",
+    "phantomjs": "^1.9.16",
+    "spooky": "^0.2.5"
+  }
+}
