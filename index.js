@@ -1,3 +1,5 @@
+var listName = process.argv.splice(2);
+
 var Spooky = require('spooky');
 
 var spooky = new Spooky({
@@ -21,13 +23,17 @@ var spooky = new Spooky({
         this.emit('log', '[INFO] Filling out login form');
         this.fillSelectors('form', {
             'input[id="username"]':  'sda1list',
-            'input[id="password"]':  'SOMEPASSWORDHERE'
+            'input[id="password"]':  'listmaster'
         }, true);
     });
     spooky.then(function () {
-        this.emit('log', this.evaluate(function () {
-            return document;
-        }));
+        this.fillSelectors('form', {}, true);
+    });
+    spooky.thenEvaluate(function (listName) {
+        this.open('http://umbc-lists.merit.edu/sympa/edit_list_request/'+listName+'/description');
+    });
+    spooky.then(function() {
+        this.emit('log', this.getHTML());
     });
     spooky.run();
 });
