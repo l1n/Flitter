@@ -1,0 +1,20 @@
+{
+	"owner": [
+		{
+			"email": "bla@umbc.edu",
+			"name":  "Test User",
+			"reception": "nomail", // Optional
+			"profile": "priv",
+		}
+		],
+	"moderator": [
+		{
+			"email": "bla@umbc.edu",
+			"name":  "Test User",
+			"profile": "priv",
+		}
+		],
+	"send": "moderator",
+	"subscribe": "moderator",
+	"add": "moderator",
+	"unsubscribe": "
