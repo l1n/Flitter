@@ -1,7 +1,7 @@
 var casper = require("casper").create();
 casper.options.waitTimeout = 20000;
 var listName = casper.cli.get("list");
-var list = {"owner": [], "editor": [], "console": []};
+var list = {"owner": [], "editor": []};
 casper.start(
         'http://umbc-lists.merit.edu');
 casper.then(function () {
@@ -34,6 +34,13 @@ casper.thenOpen('https://umbc-lists.merit.edu/sympa/edit_list_request/'+listName
                 list.editor[i][key[j]] = document.querySelector('input[id="single_param.editor.'+i+'.'+key[j]+'"],select[id="single_param.editor.'+i+'.'+key[j]+'"]').value;
             }
         }
+        return list;
+    }, list);
+});
+
+casper.thenOpen('https://umbc-lists.merit.edu/sympa/edit_list_request/'+listName+'/command', function () {
+    list = this.evaluate(function(list) {
+        list.info = document.querySelector('select[id="single_param.info.name"]').value;
         return list;
     }, list);
 });
