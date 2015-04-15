@@ -27,7 +27,7 @@ casper.thenOpen('https://umbc-lists.merit.edu/sympa/edit_list_request/'+listName
                 list.owner[i][key[j]] = document.querySelector('input[id="single_param.owner.'+i+'.'+key[j]+'"],select[id="single_param.owner.'+i+'.'+key[j]+'"]').value;
             }
         }
-        for (var i = 0; i < (document.querySelector('form[class="bold_label"] div[class="block"]:nth-of-type(5) div[class="edit_list_request_enum"]').children.length-7)/18; i++) {
+        for (var i = 0; i < (document.querySelector('form[class="bold_label"] div[class="block"]:nth-of-type(5) div[class="edit_list_request_enum"]').children.length-7)/18-1; i++) {
             list.editor[i] = {};
             var key = ['email', 'gecos'];
             for (var j = 0; j < key.length; j++) {
