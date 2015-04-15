@@ -1,13 +1,13 @@
 var casper = require("casper").create();
-var listName = casper.cli.get(0);
+casper.options.waitTimeout = 20000;
+var listName = casper.cli.get("list");
 var list = {};
 casper.start(
         'http://umbc-lists.merit.edu');
 casper.then(function () {
-    this.echo('[INFO] Filling out login form');
     this.fillSelectors('form', {
-        'input[id="username"]':  'sda1list',
-        'input[id="password"]':  'listmaster'
+        'input[id="username"]':  casper.cli.get("user"),
+        'input[id="password"]':  casper.cli.get("pass")
     }, true);
 });
 casper.waitForSelector('input[name="action_sso_login"]', function () {
@@ -19,30 +19,25 @@ casper.then(function () {
     }, true);
 });
 casper.thenOpen('https://umbc-lists.merit.edu/sympa/edit_list_request/'+listName+'/description', function () {
-    list = this.evaluate(function(list) {
-        list = {"owner": [], "editor": []};
-        for (var i = 0; i < (document.querySelector('form[class="bold_label"] div[class="block"]:nth-of-type(3) div[class="edit_list_request_enum"]').children.length-7)/18; i++) {
-            list.owner[i] = {
-            "email":'',
-            "gecos":'',
-            "profile":''
-            };
-            list.owner[i].keys().forEach(function (k) {
-                list.owner[i].k = document.querySelector('div[id="single_param.owner.'+i+'.'+k+'"]').value
-            });
+    list = this.evaluate(function() {
+        var list = {"owner": [], "editor": [], "console": []};
+        list.console[0] = (document.querySelector('form[class="bold_label"] div[class="block"]:nth-of-type(3) div[class="edit_list_request_enum"]').children.length-7)/18-1;
+        for (var i = 0; i < (document.querySelector('form[class="bold_label"] div[class="block"]:nth-of-type(3) div[class="edit_list_request_enum"]').children.length-7)/18-1; i++) {
+            list.owner[i] = {};
+            var key = ['email', 'gecos', 'profile'];
+            for (var j = 0; j < key.length; j++) {
+                list.owner[i][key[j]] = document.querySelector('input[id="single_param.owner.'+i+'.'+key[j]+'"],select[id="single_param.owner.'+i+'.'+key[j]+'"]').value;
+            }
         }
         for (var i = 0; i < (document.querySelector('form[class="bold_label"] div[class="block"]:nth-of-type(5) div[class="edit_list_request_enum"]').children.length-7)/18; i++) {
-            list.editor[i] = {
-            "email":'',
-            "gecos":'',
-            "profile":''
-            };
-            list.editor[i].keys().forEach(function (k) {
-                list.editor[i].k = document.querySelector('div[id="single_param.editor.'+i+'.'+k+'"]').value
-            });
+            list.editor[i] = {};
+            var key = ['email', 'gecos'];
+            for (var j = 0; j < key.length; j++) {
+                list.editor[i][key[j]] = document.querySelector('input[id="single_param.editor.'+i+'.'+key[j]+'"],select[id="single_param.editor.'+i+'.'+key[j]+'"]').value;
+            }
         }
         return list;
-    }, list);
+    });
 });
 
 casper.then(function () {
