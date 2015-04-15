@@ -38,13 +38,21 @@ casper.thenOpen('https://umbc-lists.merit.edu/sympa/edit_list_request/'+listName
     }, list);
 });
 
-casper.thenOpen('https://umbc-lists.merit.edu/sympa/edit_list_request/'+listName+'/command', function () {
+casper.thenOpen('https://umbc-lists.merit.edu/sympa/edit_list_request/'+listName+'/sending', function () {
     list = this.evaluate(function(list) {
-        list.info = document.querySelector('select[id="single_param.info.name"]').value;
+        list.send = document.querySelector('select[id="single_param.send.name"]').value;
         return list;
     }, list);
 });
-
+casper.thenOpen('https://umbc-lists.merit.edu/sympa/edit_list_request/'+listName+'/command', function () {
+    list = this.evaluate(function(list) {
+        var key = ['info', 'subscribe', 'add', 'unsubscribe', 'del', 'invite', 'remind', 'review'];
+            for (var j = 0; j < key.length; j++) {
+                list[key[j]] = document.querySelector('input[id="single_param.'+key[j]+'.name"],select[id="single_param.'+key[j]+'.name"]').value;
+            }
+        return list;
+    }, list);
+});
 casper.then(function () {
     this.echo(JSON.stringify(list));
 });
