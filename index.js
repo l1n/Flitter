@@ -80,7 +80,7 @@ casper.waitForSelector('input[name="action_sso_login"]', function () {
     casper.then(function () {
         casper.echo('listName:' + listName);
         var output = "";
-        if (casper.cli.get('pretty') output = JSON.stringify(list, null, 4);
+        if (casper.cli.get('pretty')) output = JSON.stringify(list, null, 4);
         else output = JSON.stringify(list);
         if (casper.cli.get('stdout')) casper.echo(output);
         else fs.writeFileSync(listName+'.json', output);
