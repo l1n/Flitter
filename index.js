@@ -15,8 +15,8 @@ casper.waitForSelector('input[name="action_sso_login"]', function () {
     casper.echo('Hit login');
     this.click('input[name="action_sso_login"]');
 });
-for (var li = 0; li < lists.length; li++) {
-    var listName = lists[li];
+//for (var li = 0; li < lists.length; li++) {
+    var listName = lists[0];
     var list = {"owner": [], "editor": []};
     casper.then(function () {
         casper.echo('Filling in form');
@@ -84,5 +84,5 @@ for (var li = 0; li < lists.length; li++) {
         else if (casper.cli.get('stdout'))                         this.echo(JSON.stringify(list));
         else                                                       fs.write(listName+'.json', JSON.stringify(list));
     });
-}
+//}
     casper.run();
