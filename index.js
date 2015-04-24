@@ -78,7 +78,7 @@ casper.waitForSelector('input[name="action_sso_login"]', function () {
     //        }, list);
     //});
     casper.then(function () {
-        casper.echo('listName:' + listName);
+        if (casper.cli.get('verbose')) casper.echo('listName:' + listName);
         var output = "";
         if (casper.cli.get('pretty')) output = JSON.stringify(list, null, 4);
         else output = JSON.stringify(list);
