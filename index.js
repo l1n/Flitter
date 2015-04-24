@@ -5,27 +5,27 @@ var lists = casper.cli.args;
 casper.start(
         'http://umbc-lists.merit.edu');
 casper.then(function () {
-    casper.echo('Filling in form');
+    if (casper.cli.get('verbose')) casper.echo('Filling in form');
     this.fillSelectors('form', {
         'input[id="username"]':  casper.cli.get("user"),
         'input[id="password"]':  casper.cli.get("pass")
     }, true);
 });
 casper.waitForSelector('input[name="action_sso_login"]', function () {
-    casper.echo('Hit login');
+    if (casper.cli.get('verbose')) casper.echo('Hit login');
     this.click('input[name="action_sso_login"]');
 });
 //for (var li = 0; li < lists.length; li++) {
     var listName = lists[0];
     var list = {"owner": [], "editor": []};
     casper.then(function () {
-        casper.echo('Filling in form');
+        if (casper.cli.get('verbose')) casper.echo('Filling in form');
         this.fillSelectors('div[class="MenuBlock menu_search"] form', {
             'input[id="filter"]': listName
         }, true);
     });
     casper.thenOpen('https://umbc-lists.merit.edu/sympa/edit_list_request/'+listName+'/description', function () {
-            casper.echo('Getting owners and moderators');
+            if (casper.cli.get('verbose')) casper.echo('Getting owners and moderators');
             list = this.evaluate(function(list) {
                 for (var i = 0; i < (document.querySelector('form[class="bold_label"] div[class="block"]:nth-of-type(3) div[class="edit_list_request_enum"]').children.length-1)/19-1; i++) {
                     list.owner[i] = {};
@@ -63,7 +63,7 @@ casper.waitForSelector('input[name="action_sso_login"]', function () {
     //            }, list, this);
     //            });
     casper.thenOpen('https://umbc-lists.merit.edu/sympa/edit_list_request/'+listName+'/command', function () {
-            casper.echo('Getting list settings');
+            if (casper.cli.get('verbose')) casper.echo('Getting list settings');
             list = this.evaluate(function(list) {
                 var key = ['info', 'subscribe', 'add', 'unsubscribe', 'del', 'invite', 'remind', 'review'];
                 for (var j = 0; j < key.length; j++) {
@@ -78,11 +78,12 @@ casper.waitForSelector('input[name="action_sso_login"]', function () {
     //        }, list);
     //});
     casper.then(function () {
-        this.echo('listName:' + listName);
-        if (casper.cli.get('verbose') && casper.cli.get('stdout')) this.echo(JSON.stringify(list, null, 4));
-        else if (casper.cli.get('verbose'))                        fs.write(listName+'.json', JSON.stringify(list, null, 4));
-        else if (casper.cli.get('stdout'))                         this.echo(JSON.stringify(list));
-        else                                                       fs.write(listName+'.json', JSON.stringify(list));
+        casper.echo('listName:' + listName);
+        var output = "";
+        if (casper.cli.get('pretty') output = JSON.stringify(list, null, 4);
+        else output = JSON.stringify(list);
+        if (casper.cli.get('stdout')) casper.echo(output);
+        else fs.writeFileSync(listName+'.json', output);
     });
 //}
     casper.run();
