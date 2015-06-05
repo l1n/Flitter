@@ -2,8 +2,8 @@ var casper = require("casper").create();
 var fs = require('fs');
 casper.options.waitTimeout = 20000;
 var lists = casper.cli.args;
-casper.start(
-        'http://umbc-lists.merit.edu');
+var baseUrl = casper.cli.get('base') || 'https://lists.umbc.edu';
+casper.start(baseUrl);
 casper.then(function () {
     if (casper.cli.get('verbose')) casper.echo('Filling in form');
     this.fillSelectors('form', {
@@ -11,12 +11,16 @@ casper.then(function () {
         'input[id="password"]':  casper.cli.get("pass")
     }, true);
 });
+casper.then(function () {
+    if (casper.cli.get('debug') === 'authentication') {
+        casper.echo(this.fetchText('body'));
+    }
+});
 casper.waitForSelector('input[name="action_sso_login"]', function () {
     if (casper.cli.get('verbose')) casper.echo('Hit login');
     this.click('input[name="action_sso_login"]');
 });
-//for (var li = 0; li < lists.length; li++) {
-    var listName = lists[0];
+lists.forEach(function (listName) {
     var list = {"owner": [], "editor": []};
     casper.then(function () {
         if (casper.cli.get('verbose')) casper.echo('Filling in form');
@@ -24,7 +28,8 @@ casper.waitForSelector('input[name="action_sso_login"]', function () {
             'input[id="filter"]': listName
         }, true);
     });
-    casper.thenOpen('https://umbc-lists.merit.edu/sympa/edit_list_request/'+listName+'/description', function () {
+if (!casper.cli.get('only') || casper.cli.get('only') === 'description') {
+    casper.thenOpen(baseUrl+'/sympa/edit_list_request/'+listName+'/description', function () {
             if (casper.cli.get('verbose')) casper.echo('Getting owners and moderators');
             list = this.evaluate(function(list) {
                 for (var i = 0; i < (document.querySelector('form[class="bold_label"] div[class="block"]:nth-of-type(3) div[class="edit_list_request_enum"]').children.length-1)/19-1; i++) {
@@ -43,7 +48,13 @@ casper.waitForSelector('input[name="action_sso_login"]', function () {
                 }
                 return list;
             }, list);
+            if (casper.cli.get('verbose')) casper.echo('Getting visibility');
+            list = this.evaluate(function(list) {
+                list.visibility = document.querySelector('select[id="single_param.visibility.name"]').value;
+                return list;
+            }, list);
             });
+}
 
     //    casper.thenOpen('https://umbc-lists.merit.edu/sympa/edit_list_request/'+listName+'/sending', function () {
     //            list = this.evaluate(function(list, selfie) {
@@ -62,7 +73,8 @@ casper.waitForSelector('input[name="action_sso_login"]', function () {
     //                return list;
     //            }, list, this);
     //            });
-    casper.thenOpen('https://umbc-lists.merit.edu/sympa/edit_list_request/'+listName+'/command', function () {
+if (!casper.cli.get('only') || casper.cli.get('only') === 'command') {
+    casper.thenOpen(baseUrl+'/sympa/edit_list_request/'+listName+'/command', function () {
             if (casper.cli.get('verbose')) casper.echo('Getting list settings');
             list = this.evaluate(function(list) {
                 var key = ['info', 'subscribe', 'add', 'unsubscribe', 'del', 'invite', 'remind', 'review'];
@@ -72,6 +84,7 @@ casper.waitForSelector('input[name="action_sso_login"]', function () {
                 return list;
             }, list);
             });
+}
     //casper.thenOpen('https://umbc-lists.merit.edu/sympa/review/'+listName+'/1/1000/email', function() {
     //        list = this.evaluate(function(list) {
     //            
@@ -83,7 +96,7 @@ casper.waitForSelector('input[name="action_sso_login"]', function () {
         if (casper.cli.get('pretty')) output = JSON.stringify(list, null, 4);
         else output = JSON.stringify(list);
         if (casper.cli.get('stdout')) casper.echo(output);
-        else fs.writeFileSync(listName+'.json', output);
+        else fs.write(listName+'.json', output, 'w');
     });
-//}
+});
     casper.run();
