@@ -7,7 +7,7 @@ This intentionally does not use the SOAP API because of the way our Single Sign-
 
 ## Syntax
 ### read.js
-    casperjs read.js --user=username --pass=password [--verbose] [--legacy] [--base=http://example.sympa.com/] [--only=description] [--pretty] [--stdout] list1 [list2 list3 ...] 
+    casperjs read.js --user=username --pass=password [--verbose] [--legacy] [--base=http://example.sympa.com/] [--only=description] [--pretty] [--stdout] list1 [list2 ...] 
 ```
 --verbose gives more output about what's going on throughout the program
 --legacy swaps the order of SSO prompts and hitting the Sympa login functionality. Implicitly sets the --base path.
@@ -15,4 +15,11 @@ This intentionally does not use the SOAP API because of the way our Single Sign-
 --only allows scraping only a single page of the config
 --pretty sets the JSON output to indent and add newlines
 --stdout dumps configs to the screen instead of writing them to [listname].json
+```
+### write.js
+    casperjs write.js --user=username --pass=password [--verbose] [--legacy] [--base=http://example.sympa.com/] list1=sendtype [list2=sendtype ...] 
+```
+--verbose gives more output about what's going on throughout the program
+--legacy swaps the order of SSO prompts and hitting the Sympa login functionality. Implicitly sets the --base path.
+--base sets the base uri for sympa requests (including the /sympa directory if you have one)
 ```
